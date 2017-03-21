@@ -1,2 +1,2 @@
 # wemos
-Libraries written while playing with Wemos
+Libraries written while learning and playing with Wemos
