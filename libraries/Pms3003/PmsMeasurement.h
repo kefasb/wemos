@@ -11,9 +11,9 @@
 #define PMS3003_PMS3003MEASUREMENT_H_
 
 #include <stdint.h>
+#include "./pmsdata/EmptyData.h"
+#include "./pmsdata/PmsData.h"
 #include "Pms3003.h"
-#include "PmsData.h"
-#include "EmptyData.h"
 
 typedef uint16_t (PmsData::*PMGetter)(void) const;
 typedef uint8_t MeasureNumber;
@@ -55,7 +55,8 @@ private:
     const MeasureNumber measuresNumber;
     const MeasureNumber measuresToCount;
 
-    bool wakupPms() const;bool sleepPms() const;
+    bool wakupPms() const;
+    bool sleepPms() const;
     void warmup() const;
     void doMeasurements(PMUnit pm01MeasuresData[], PMUnit pm25MeasuresData[],
             PMUnit pm10MeasuresData[]) const;

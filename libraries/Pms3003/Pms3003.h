@@ -14,8 +14,8 @@ class Logger;
 
 #include "Arduino.h"
 #include "Stream.h"
-#include "PmsData.h"
-#include "EmptyData.h"
+#include "./pmsdata/PmsData.h"
+#include "./pmsdata/EmptyData.h"
 #include "NullLogger.h"
 
 class Pms3003 {

@@ -53,16 +53,17 @@ public:
      * Checks whether connected to wifi.
      * @return true when connected to wifi, false otherwise.
      */
-    bool isConnected();
+    bool isConnected() const;
 
 private:
     ESP8266WiFiClass& wifi;
-    const Logger* const logger;
+    const Logger& logger;
 
     char ssid[33];
     char pass[65];
 
-    bool disconnect(bool off);bool settingsChanged(const char* ssid, const char* pass);
+    bool disconnect(bool off);
+    bool settingsChanged(const char* ssid, const char* pass) const;
     void configureAndConnectWifi(const char* ssid, const char* pass);
     void initialize();
 };

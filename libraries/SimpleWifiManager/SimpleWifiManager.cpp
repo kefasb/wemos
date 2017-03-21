@@ -14,7 +14,7 @@ void SimpleWifiManager::initialize() {
 }
 
 SimpleWifiManager::SimpleWifiManager(ESP8266WiFiClass& wifi, const Logger& logger) :
-        wifi(wifi), logger(&logger) {
+        wifi(wifi), logger(logger) {
     initialize();
 }
 
@@ -24,9 +24,9 @@ SimpleWifiManager::~SimpleWifiManager() {
 bool SimpleWifiManager::disconnect(bool off) {
     bool disconnected = wifi.disconnect(off);
     if (disconnected) {
-        logger->logInfo("WiFi disconnected");
+        logger.logInfo("WiFi disconnected");
     } else {
-        logger->logInfo("Unable to disconnect WiFi");
+        logger.logError("Unable to disconnect WiFi");
     }
     return disconnected;
 }
@@ -39,7 +39,7 @@ bool SimpleWifiManager::disconnectAndOff() {
     return disconnect(true);
 }
 
-bool SimpleWifiManager::settingsChanged(const char* ssid, const char* pass) {
+bool SimpleWifiManager::settingsChanged(const char* ssid, const char* pass) const {
     return strcmp(this->ssid, ssid) || strcmp(this->pass, pass);
 }
 
@@ -51,10 +51,10 @@ void SimpleWifiManager::configureAndConnectWifi(const char* ssid, const char* pa
      * TODO to be investigated
      */
     if (!settingsChanged(ssid, pass)) {
-        logger->logDebug("Same WiFi settings");
+        logger.logDebug("Same WiFi settings");
         wifi.begin(ssid, pass);
     } else {
-        logger->logDebug("New WiFi settings");
+        logger.logDebug("New WiFi settings");
         strcpy(this->ssid, ssid);
         strcpy(this->pass, pass);
         wifi.begin(ssid, pass);
@@ -67,27 +67,27 @@ bool SimpleWifiManager::connect(const char* ssid, const char* pass, uint32_t tim
     }
 
     bool result = false;
-    logger->logInfo("Connecting to WiFi");
+    logger.logInfo("Connecting to WiFi");
     configureAndConnectWifi(ssid, pass);
     TimeoutTimer connectionTimer = TimeoutTimer(timeout);
     while (!isConnected() && connectionTimer.isRunning()) {
         delay(500);
-        logger->logInfo(".");
+        logger.logInfo(".");
         connectionTimer.tick();
     }
 
     if (isConnected()) {
-        logger->logInfo("WiFi connected");
+        logger.logInfo("WiFi connected");
         result = true;
     } else {
-        logger->logInfo("Unable to connect to WiFi");
+        logger.logError("Unable to connect to WiFi");
         disconnect();
     }
 
     return result;
 }
 
-bool SimpleWifiManager::isConnected() {
+bool SimpleWifiManager::isConnected() const {
     return wifi.isConnected();
 }
 
