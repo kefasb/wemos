@@ -11,7 +11,7 @@
 #ifndef TIMER_CONDITIONALTIMER_H_
 #define TIMER_CONDITIONALTIMER_H_
 
-#include "./base/BaseTimer.h"
+#include "BaseTimer.h"
 #include "IntervalTimer.h"
 
 class ConditionalTimer: public BaseTimer {

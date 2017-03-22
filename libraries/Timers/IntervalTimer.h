@@ -10,7 +10,7 @@
 #ifndef TIMER_INTERVALTIMER_H_
 #define TIMER_INTERVALTIMER_H_
 
-#include "./base/UnconditionalTimer.h"
+#include "UnconditionalTimer.h"
 
 class IntervalTimer: public UnconditionalTimer {
 public:

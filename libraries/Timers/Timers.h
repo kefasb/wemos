@@ -10,11 +10,11 @@
 #define TIMER_TIMERS_H_
 
 #include <stddef.h>
-#include "./base/ITimer.h"
+#include "ITimer.h"
 #include "TimeoutTimer.h"
 #include "IntervalTimer.h"
 
-typedef int8_t TimerId;
+typedef int8_t TimerSlot;
 
 class Timers {
 public:
@@ -37,7 +37,7 @@ public:
      * @return Valid {@link TimerId} when successfully created timer,
      *          {@link INVALID_TIMER_ID} otherwise.
      */
-    TimerId timeoutTimer(uint32_t timeout, void (*callback)());
+    TimerSlot timeoutTimer(uint32_t timeout, void (*callback)());
 
     /**
      * Tries to create infinite {@link IntervalTimer} object with given settings.
@@ -46,7 +46,7 @@ public:
      * @return Valid {@link TimerId} when successfully created timer,
      *          {@link INVALID_TIMER_ID} otherwise.
      */
-    TimerId intervalTimer(uint32_t interval, void (*callback)());
+    TimerSlot intervalTimer(uint32_t interval, void (*callback)());
 
     /**
      * Tries to create {@link IntervalTimer} object with given settings.
@@ -56,7 +56,7 @@ public:
      * @return Valid {@link TimerId} when successfully created timer,
      *          {@link INVALID_TIMER_ID} otherwise.
      */
-    TimerId intervalTimer(uint32_t interval, void (*callback)(), uint16_t loopsLimit);
+    TimerSlot intervalTimer(uint32_t interval, void (*callback)(), uint16_t loopsLimit);
 
     /**
      * Timers tick
@@ -68,14 +68,27 @@ private:
 
     ITimer* timers[MAX_TIMERS];
 
-    bool isTimerIdValid(TimerId timerId);
-    bool isDeadTimer(TimerId id);
-    TimerId findFreeTimerId();
-    void assignIdToTimer(TimerId timerId, ITimer* timer);
+    bool isTimerIdValid(TimerSlot timerId);
+    bool isDeadTimer(TimerSlot id);
+    TimerSlot findFreeTimerId();
+    void assignIdToTimer(TimerSlot timerId, ITimer* timer);
     void deleteDeadTimers();
     void performTimersActions() const;
-    void deleteTimer(TimerId id);
-    void tickTimer(TimerId id) const;
+    void deleteTimer(TimerSlot id);
+    void tickTimer(TimerSlot id) const;
 };
 
+typedef uint16_t TimerId;
+
+class TimerWithId {
+public:
+    ITimer* getTimer();
+    TimerId getId();
+
+    virtual ~TimerWithId();
+
+private:
+    ITimer* timer;
+    TimerId id;
+};
 #endif /* TIMER_TIMERS_H_ */

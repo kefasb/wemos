@@ -11,8 +11,8 @@
 #define PMS3003_PMS3003MEASUREMENT_H_
 
 #include <stdint.h>
-#include "./pmsdata/EmptyData.h"
-#include "./pmsdata/PmsData.h"
+#include "EmptyData.h"
+#include "PmsData.h"
 #include "Pms3003.h"
 
 typedef uint16_t (PmsData::*PMGetter)(void) const;

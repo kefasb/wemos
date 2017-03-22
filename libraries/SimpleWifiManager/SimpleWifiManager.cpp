@@ -70,6 +70,7 @@ bool SimpleWifiManager::connect(const char* ssid, const char* pass, uint32_t tim
     logger.logInfo("Connecting to WiFi");
     configureAndConnectWifi(ssid, pass);
     TimeoutTimer connectionTimer = TimeoutTimer(timeout);
+    connectionTimer.start();
     while (!isConnected() && connectionTimer.isRunning()) {
         delay(500);
         logger.logInfo(".");
