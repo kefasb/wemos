@@ -15,7 +15,6 @@
 #include "PmsData.h"
 #include "Pms3003.h"
 
-typedef uint16_t (PmsData::*PMGetter)(void) const;
 typedef uint8_t MeasureNumber;
 
 class PmsMeasurement {

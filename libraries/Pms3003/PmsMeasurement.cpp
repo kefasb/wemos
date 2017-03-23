@@ -7,6 +7,8 @@
 
 #include "PmsMeasurement.h"
 
+typedef uint32_t PMSumUnit;
+
 PmsMeasurement::PmsMeasurement(Pms3003& pms, MeasureNumber measures, MeasureNumber warmupMeasures) :
         pms(pms), warmupMeasuresNumber(warmupMeasures), measuresNumber(measures), measuresToCount(
                 measuresNumber - HIGH_MEASURES_DROP - LOW_MEASURES_DROP) {
@@ -49,9 +51,9 @@ void PmsMeasurement::doMeasurements(PMUnit pm01MeasuresData[], PMUnit pm25Measur
 
 PmsData PmsMeasurement::measurementsAverage(PMUnit pm01MeasuresData[], PMUnit pm25MeasuresData[],
         PMUnit pm10MeasuresData[]) const {
-    PMUnit pm01Sum = 0;
-    PMUnit pm25Sum = 0;
-    PMUnit pm10Sum = 0;
+    PMSumUnit pm01Sum = 0;
+    PMSumUnit pm25Sum = 0;
+    PMSumUnit pm10Sum = 0;
     for (MeasureNumber i = 0; i < measuresNumber; i++) {
         pm01Sum += pm01MeasuresData[i];
         pm25Sum += pm25MeasuresData[i];
@@ -91,7 +93,7 @@ void PmsMeasurement::validateMeasurements(PMUnit pm01MeasuresData[], PMUnit pm25
         pm25MeasuresData[i] = 0;
         pm10MeasuresData[i] = 0;
     }
-    for (MeasureNumber i = measuresNumber - HIGH_MEASURES_DROP - 1; i < measuresNumber; i++) {
+    for (MeasureNumber i = measuresNumber - HIGH_MEASURES_DROP; i < measuresNumber; i++) {
         pm01MeasuresData[i] = 0;
         pm25MeasuresData[i] = 0;
         pm10MeasuresData[i] = 0;
