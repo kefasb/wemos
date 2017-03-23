@@ -9,13 +9,21 @@
 #ifndef LOGGER_NULLLOGGER_H_
 #define LOGGER_NULLLOGGER_H_
 
-#include "Logger.h"
-#include "NullPrint.h"
+#include "ILogger.h"
 
-class NullLogger: public Logger {
+class NullLogger: public ILogger {
 public:
-    NullLogger();
-    virtual ~NullLogger();
+    virtual ~NullLogger() {
+    }
+
+    void logDebug(const char* const , ...) const override final {
+    }
+
+    void logInfo(const char* const , ...) const override final {
+    }
+
+    void logError(const char* const , ...) const override final {
+    }
 };
 
 extern NullLogger DefaultNullLogger;

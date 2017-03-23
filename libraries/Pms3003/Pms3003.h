@@ -14,6 +14,7 @@ class Logger;
 
 #include "Arduino.h"
 #include "Stream.h"
+#include "ILogger.h"
 #include "NullLogger.h"
 #include "PmsData.h"
 #include "EmptyData.h"
@@ -28,7 +29,7 @@ public:
      * @param setPin Pin to be used to put Pms3003 to sleep and wake it up
      * @param logger {@link Logger} to be used for logging
      */
-    Pms3003(Stream& pmsSerial, uint8_t setPin, const Logger& logger = DefaultNullLogger);
+    Pms3003(Stream& pmsSerial, uint8_t setPin, const ILogger& logger = DefaultNullLogger);
 
     /**
      * destructor
@@ -80,7 +81,7 @@ private:
 
     Stream& serial;
     const uint8_t setPin;
-    const Logger* logger;
+    const ILogger& logger;
 
     bool validateChecksum(const uint8_t buf[]) const;
     uint16_t extractChecksum(const uint8_t buf[]) const;

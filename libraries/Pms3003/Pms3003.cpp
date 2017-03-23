@@ -15,8 +15,8 @@ void Pms3003::insertHeaderToBuf(uint8_t buf[]) const {
     }
 }
 
-Pms3003::Pms3003(Stream& pmsSerial, uint8_t setPin, const Logger& logger) :
-        serial(pmsSerial), setPin(setPin), logger(&logger) {
+Pms3003::Pms3003(Stream& pmsSerial, uint8_t setPin, const ILogger& logger) :
+        serial(pmsSerial), setPin(setPin), logger(logger) {
 }
 
 Pms3003::~Pms3003() {
@@ -28,7 +28,7 @@ void Pms3003::printBufferContents(const uint8_t buf[]) const {
     for (uint8_t i = 0; i < BUF_LEN; i++) {
         length += sprintf(&bufferStr[length], "%d", buf[i]);
     }
-    logger->logDebug(bufferStr);
+    logger.logDebug(bufferStr);
 }
 
 PmsData Pms3003::readData() {
@@ -57,9 +57,9 @@ void Pms3003::clearData() {
 }
 
 void Pms3003::printChecksums(const uint16_t sum, const uint16_t receivedSum) const {
-    logger->logDebug("Checksum mismatch!");
-    logger->logDebug("Calculated sum: %u", sum);
-    logger->logDebug("Received sum: %u", receivedSum);
+    logger.logDebug("Checksum mismatch!");
+    logger.logDebug("Calculated sum: %u", sum);
+    logger.logDebug("Received sum: %u", receivedSum);
 }
 
 bool Pms3003::validateChecksum(const uint8_t buf[]) const {
@@ -106,7 +106,7 @@ bool Pms3003::wakeup() {
 
     bool successful = checkCount >= 0;
     if (!successful) {
-        logger->logError("Wakeup unsuccessful!");
+        logger.logError("Wakeup unsuccessful!");
     }
     return successful;
 }
@@ -119,7 +119,7 @@ bool Pms3003::sleep() {
     } while ((--checkCount >= 0) && (readData() != EmptyData()));
     bool successful = checkCount >= 0;
     if (!successful) {
-        logger->logError("Sleep unsuccessful!");
+        logger.logError("Sleep unsuccessful!");
     }
     if (successful) {
         clearData();

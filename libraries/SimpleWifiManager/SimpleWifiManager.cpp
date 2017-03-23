@@ -13,7 +13,7 @@ void SimpleWifiManager::initialize() {
     this->pass[0] = 0;
 }
 
-SimpleWifiManager::SimpleWifiManager(ESP8266WiFiClass& wifi, const Logger& logger) :
+SimpleWifiManager::SimpleWifiManager(ESP8266WiFiClass& wifi, const ILogger& logger) :
         wifi(wifi), logger(logger) {
     initialize();
 }

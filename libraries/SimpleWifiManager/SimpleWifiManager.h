@@ -12,7 +12,7 @@
 #include "ESP8266WiFi.h"
 #include "Duration.h"
 #include "TimeoutTimer.h"
-#include "Logger.h"
+#include "ILogger.h"
 #include "NullLogger.h"
 
 class SimpleWifiManager {
@@ -23,7 +23,7 @@ public:
      * @param wifi WiFi object to be handled
      * @param logger (@link Logger} to be used for logging
      */
-    SimpleWifiManager(ESP8266WiFiClass& wifi, const Logger& logger = DefaultNullLogger);
+    SimpleWifiManager(ESP8266WiFiClass& wifi, const ILogger& logger = DefaultNullLogger);
 
     /**
      * destructor
@@ -57,7 +57,7 @@ public:
 
 private:
     ESP8266WiFiClass& wifi;
-    const Logger& logger;
+    const ILogger& logger;
 
     char ssid[33];
     char pass[65];

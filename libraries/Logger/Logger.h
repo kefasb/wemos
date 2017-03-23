@@ -16,12 +16,13 @@
 #define LOGGER_LOGGER_H_
 
 #include "Print.h"
+#include "ILogger.h"
 
 enum LogLevel {
     NONE = -1, ERROR = 5, INFO = 10, DEBUG = 15, ALL = 100
 };
 
-class Logger {
+class Logger: public ILogger {
 public:
     /**
      * Creates logger that will send logs to provided Print interface and will include
@@ -44,26 +45,11 @@ public:
      */
     virtual ~Logger();
 
-    /**
-     * Tries to log given text on DEBUG level. It checks if logging level allows it.
-     * @param text Text to be logged, may be a format
-     * @param args Additional arguments if text is a format
-     */
-    virtual void logDebug(const char* const text, ...) const;
+    void logDebug(const char* const text, ...) const override;
 
-    /**
-     * Tries to log given text on INFO level. It checks if logging level allows it.
-     * @param text Text to be logged, may be a format
-     * @param args Additional arguments if text is a format
-     */
-    virtual void logInfo(const char* const text, ...) const;
+    void logInfo(const char* const text, ...) const override;
 
-    /**
-     * Tries to log given text on ERROR level. It checks if logging level allows it.
-     * @param text Text to be logged, may be a format
-     * @param args Additional arguments if text is a format
-     */
-    virtual void logError(const char* const text, ...) const;
+    void logError(const char* const text, ...) const override;
 
 private:
     static constexpr char DEBUG_TXT[] = "[DEBUG] ";
