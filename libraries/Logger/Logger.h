@@ -71,7 +71,6 @@ private:
     static constexpr char ERROR_TXT[] = "[ERROR] ";
 
     Print& out;
-    const char* const className;
     char* prefix;
     const LogLevel logLevel;
 
