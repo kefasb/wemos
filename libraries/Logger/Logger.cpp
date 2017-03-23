@@ -12,7 +12,7 @@ constexpr char Logger::INFO_TXT[];
 constexpr char Logger::ERROR_TXT[];
 
 Logger::Logger(Print& out, const char* const className, LogLevel logLevel) :
-        out(out), className(className), logLevel(logLevel) {
+        out(out), logLevel(logLevel) {
 
     prefix = new char[strlen(className) + 3];
     strcpy(prefix, className);
@@ -20,12 +20,13 @@ Logger::Logger(Print& out, const char* const className, LogLevel logLevel) :
 }
 
 Logger::Logger(Print& out, LogLevel logLevel) :
-        out(out), className(""), logLevel(logLevel) {
+        out(out), logLevel(logLevel) {
 
     prefix = NULL;
 }
 
 Logger::~Logger() {
+    delete[] prefix;
 }
 
 void Logger::logIt(const char* const levelTxt, const char* const text, ...) const {
