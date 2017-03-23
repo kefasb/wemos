@@ -71,8 +71,8 @@ private:
     static constexpr char ERROR_TXT[] = "[ERROR] ";
 
     Print& out;
-    char* prefix;
     const LogLevel logLevel;
+    char* prefix;
 
     void logIt(const char* const severity, const char* const text, ...) const;
 

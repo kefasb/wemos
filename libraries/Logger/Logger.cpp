@@ -20,13 +20,13 @@ Logger::Logger(Print& out, const char* const className, LogLevel logLevel) :
 }
 
 Logger::Logger(Print& out, LogLevel logLevel) :
-        out(out), logLevel(logLevel) {
-
-    prefix = NULL;
+        out(out), logLevel(logLevel), prefix(NULL) {
 }
 
 Logger::~Logger() {
-    delete[] prefix;
+    if (NULL != prefix) {
+        delete[] prefix;
+    }
 }
 
 void Logger::logIt(const char* const levelTxt, const char* const text, ...) const {
