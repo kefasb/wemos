@@ -69,10 +69,12 @@ private:
     static constexpr char DEBUG_TXT[] = "[DEBUG] ";
     static constexpr char INFO_TXT[] = "[INFO] ";
     static constexpr char ERROR_TXT[] = "[ERROR] ";
+    static const uint8_t PREFIX_MAX_LENGTH = 22;
+    static const uint8_t CLASS_NAME_MAX_LENGTH = 20;
 
     Print& out;
     const LogLevel logLevel;
-    char* prefix;
+    char prefix[PREFIX_MAX_LENGTH + 1];
 
     void logIt(const char* const severity, const char* const text, ...) const;
 
