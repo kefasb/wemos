@@ -8,94 +8,95 @@
 #include "Timers.h"
 
 Timers::Timers() {
-    for (TimerSlot id = 0; id < MAX_TIMERS; id++) {
-        timers[id] = NULL;
+    for (TimerSlot slot = 0; slot < MAX_TIMERS; slot++) {
+        timers[slot] = NULL;
     }
 }
 
 Timers::~Timers() {
-    for (TimerSlot id = 0; id < MAX_TIMERS; id++) {
-        if (NULL != timers[id]) {
-            deleteTimer(id);
+    for (TimerSlot slot = 0; slot < MAX_TIMERS; slot++) {
+        if (NULL != timers[slot]) {
+            deleteTimer(slot);
         }
     }
 }
 
-TimerSlot Timers::findFreeTimerId() {
-    TimerSlot freeId = INVALID_TIMER_ID;
-    for (TimerSlot id = 0; id < MAX_TIMERS; id++) {
-        if (NULL == timers[id]) {
-            freeId = id;
+TimerSlot Timers::findFreeTimerSlot() {
+    TimerSlot freeSlot = INVALID_TIMER;
+    for (TimerSlot slot = 0; slot < MAX_TIMERS; slot++) {
+        if (NULL == timers[slot]) {
+            freeSlot = slot;
             break;
         }
     }
-    return freeId;
+    return freeSlot;
 }
 
-bool Timers::isTimerIdValid(TimerSlot timerId) {
-    return timerId >= 0;
+bool Timers::isTimerSlotValid(TimerSlot timerSlot) {
+    return timerSlot >= 0;
 }
 
-void Timers::assignIdToTimer(TimerSlot timerId, ITimer* timer) {
-    timers[timerId] = timer;
+void Timers::assignSlotToTimer(TimerSlot timerSlot, ITimer* timer) {
+    timers[timerSlot] = timer;
 }
 
 TimerSlot Timers::timeoutTimer(uint32_t timeout, void (*callback)()) {
-    TimerSlot timerId = findFreeTimerId();
-    if (isTimerIdValid(timerId)) {
+    TimerSlot timerSlot = findFreeTimerSlot();
+    if (isTimerSlotValid(timerSlot)) {
         TimeoutTimer* timeoutTimer = new TimeoutTimer(timeout, callback);
-        assignIdToTimer(timerId, timeoutTimer);
+        assignSlotToTimer(timerSlot, timeoutTimer);
+
         timeoutTimer->start();
     }
-    return timerId;
+    return timerSlot;
 }
 
 TimerSlot Timers::intervalTimer(uint32_t interval, void (*callback)()) {
-    TimerSlot timerId = findFreeTimerId();
-    if (isTimerIdValid(timerId)) {
+    TimerSlot timerSlot = findFreeTimerSlot();
+    if (isTimerSlotValid(timerSlot)) {
         IntervalTimer* intervalTimer = new IntervalTimer(interval, callback);
-        assignIdToTimer(timerId, intervalTimer);
+        assignSlotToTimer(timerSlot, intervalTimer);
         intervalTimer->start();
     }
-    return timerId;
+    return timerSlot;
 }
 
 TimerSlot Timers::intervalTimer(uint32_t interval, void (*callback)(), uint16_t loopsLimit) {
-    TimerSlot timerId = findFreeTimerId();
-    if (isTimerIdValid(timerId)) {
+    TimerSlot timerSlot = findFreeTimerSlot();
+    if (isTimerSlotValid(timerSlot)) {
         IntervalTimer* intervalTimer = new IntervalTimer(interval, callback, loopsLimit);
-        assignIdToTimer(timerId, intervalTimer);
+        assignSlotToTimer(timerSlot, intervalTimer);
         intervalTimer->start();
     }
-    return timerId;
+    return timerSlot;
 }
 
-bool Timers::isDeadTimer(TimerSlot id) {
-    return (NULL != timers[id]) && (!timers[id]->isRunning());
+bool Timers::isDeadTimer(TimerSlot slot) {
+    return (NULL != timers[slot]) && (!timers[slot]->isRunning());
 }
 
-void Timers::deleteTimer(TimerSlot id) {
-    delete timers[id];
-    timers[id] = NULL;
+void Timers::deleteTimer(TimerSlot slot) {
+    delete timers[slot];
+    timers[slot] = NULL;
 }
 
 void Timers::deleteDeadTimers() {
-    for (TimerSlot id = 0; id < MAX_TIMERS; id++) {
-        if (isDeadTimer(id)) {
-            deleteTimer(id);
+    for (TimerSlot slot = 0; slot < MAX_TIMERS; slot++) {
+        if (isDeadTimer(slot)) {
+            deleteTimer(slot);
         }
     }
 }
 
-void Timers::tickTimer(TimerSlot id) const {
-    if (NULL != timers[id]) {
-        timers[id]->tick();
+void Timers::tickTimer(TimerSlot slot) const {
+    if (NULL != timers[slot]) {
+        timers[slot]->tick();
     }
 }
 
 void Timers::performTimersActions() const {
-    for (TimerSlot id = 0; id < MAX_TIMERS; id++) {
-        tickTimer(id);
+    for (TimerSlot slot = 0; slot < MAX_TIMERS; slot++) {
+        tickTimer(slot);
     }
 }
 

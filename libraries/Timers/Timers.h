@@ -18,7 +18,7 @@ typedef int8_t TimerSlot;
 
 class Timers {
 public:
-    static const int8_t INVALID_TIMER_ID = -1;
+    static const int8_t INVALID_TIMER = -1;
 
     /**
      * Creates timers managing object.
@@ -64,31 +64,26 @@ public:
     void tick();
 
 private:
+    typedef uint16_t TimerId;
+    struct TimerWithId {
+        ITimer* timer;
+        TimerId id;
+    };
+
     static const uint8_t MAX_TIMERS = 15;
 
+    TimerId maxId = 0;
     ITimer* timers[MAX_TIMERS];
+    TimerWithId timersWithId[MAX_TIMERS];
 
-    bool isTimerIdValid(TimerSlot timerId);
-    bool isDeadTimer(TimerSlot id);
-    TimerSlot findFreeTimerId();
-    void assignIdToTimer(TimerSlot timerId, ITimer* timer);
+    bool isTimerSlotValid(TimerSlot timerSlot);
+    bool isDeadTimer(TimerSlot slot);
+    TimerSlot findFreeTimerSlot();
+    void assignSlotToTimer(TimerSlot timerSlot, ITimer* timer);
     void deleteDeadTimers();
     void performTimersActions() const;
-    void deleteTimer(TimerSlot id);
-    void tickTimer(TimerSlot id) const;
+    void deleteTimer(TimerSlot slot);
+    void tickTimer(TimerSlot slot) const;
 };
 
-typedef uint16_t TimerId;
-
-class TimerWithId {
-public:
-    ITimer* getTimer();
-    TimerId getId();
-
-    virtual ~TimerWithId();
-
-private:
-    ITimer* timer;
-    TimerId id;
-};
 #endif /* TIMER_TIMERS_H_ */
