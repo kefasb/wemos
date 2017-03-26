@@ -12,30 +12,34 @@
 
 #include "Timers.h"
 
+#include "ConnectionData.h"
+
 uint32_t startTime;
+
+ConnectionData connectionData;
 
 /* PMS settings */
 const uint8_t PMS_SET_PIN = D3;
-const uint32_t PMS_TIMER = Duration::Minutes(4);
+const uint32_t PMS_READ_INTERVAL = Duration::Minutes(4);
 Logger pmsLogger(Serial, "Pms3003", INFO);
 Pms3003 pms3003(Serial, PMS_SET_PIN, pmsLogger);
 PmsData lastPmsData = EmptyData();
 
 /* WiFi settings */
-const char ssid[] = "xxx";
-const char pass[] = "xxx";
+const char* ssid = connectionData.ssid;
+const char* pass = connectionData.pass;
 
 /* Blynk settings */
 const uint8_t BLYNK_PM25_DISPLAY = V20;
 const uint8_t BLYNK_PM10_DISPLAY = V21;
 const uint8_t BLYNK_PREVIOUS_DISPLAY = V22;
-const char authToken[] = "xxx";
+const char* authToken = connectionData.blynkAuth;
 
 /* Wifi */
 Logger simpleWifiManagerLogger(Serial, "SimpleWifiManger", INFO);
 SimpleWifiManager wifiManager = SimpleWifiManager(WiFi, simpleWifiManagerLogger);
 
-/* Other */
+/* Timers */
 Timers timers;
 
 bool connectWifi() {
@@ -92,7 +96,7 @@ void gatherPmsData() {
 
 void firstGatherPmsData() {
     gatherPmsData();
-    timers.intervalTimer(PMS_TIMER, gatherPmsData);
+    timers.intervalTimer(PMS_READ_INTERVAL, gatherPmsData);
 }
 
 void sendDataToBlynk() {
@@ -105,6 +109,7 @@ void processPmsData() {
     if (lastPmsData != EmptyData()) {
         if (connect()) {
             sendDataToBlynk();
+
             timers.timeoutTimer(Duration::Seconds(3), disconnectWifi);
             processingEnd = true;
         } else {
@@ -137,4 +142,5 @@ void loop() {
 
     delay(100);
 }
+
 
