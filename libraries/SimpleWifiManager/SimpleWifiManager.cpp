@@ -7,15 +7,9 @@
 
 #include "SimpleWifiManager.h"
 
-void SimpleWifiManager::initialize() {
-    this->wifi.persistent(false);
-    this->ssid[0] = 0;
-    this->pass[0] = 0;
-}
-
-SimpleWifiManager::SimpleWifiManager(ESP8266WiFiClass& wifi, const ILogger& logger) :
-        wifi(wifi), logger(logger) {
-    initialize();
+SimpleWifiManager::SimpleWifiManager(ESP8266WiFiClass& wifi, const IWifiConnectionData& wifiData,
+        const ILogger& logger) :
+        wifi(wifi), wifiData(wifiData), logger(logger) {
 }
 
 SimpleWifiManager::~SimpleWifiManager() {
@@ -39,10 +33,6 @@ bool SimpleWifiManager::disconnectAndOff() {
     return disconnect(true);
 }
 
-bool SimpleWifiManager::settingsChanged(const char* ssid, const char* pass) const {
-    return strcmp(this->ssid, ssid) || strcmp(this->pass, pass);
-}
-
 void SimpleWifiManager::configureAndConnectWifi(const char* ssid, const char* pass) {
     wifi.mode(WIFI_STA);
     /**
@@ -50,15 +40,7 @@ void SimpleWifiManager::configureAndConnectWifi(const char* ssid, const char* pa
      * settings not changed. However not worked at sight.
      * TODO to be investigated
      */
-    if (!settingsChanged(ssid, pass)) {
-        logger.logDebug("Same WiFi settings");
-        wifi.begin(ssid, pass);
-    } else {
-        logger.logDebug("New WiFi settings");
-        strcpy(this->ssid, ssid);
-        strcpy(this->pass, pass);
-        wifi.begin(ssid, pass);
-    }
+    wifi.begin(ssid, pass);
 }
 
 bool SimpleWifiManager::connect(const char* ssid, const char* pass, uint32_t timeout) {
@@ -86,6 +68,10 @@ bool SimpleWifiManager::connect(const char* ssid, const char* pass, uint32_t tim
     }
 
     return result;
+}
+
+bool SimpleWifiManager::connect(uint32_t timeout) {
+    return connect(wifiData.getSsid(), wifiData.getPass(), timeout);
 }
 
 bool SimpleWifiManager::isConnected() const {
