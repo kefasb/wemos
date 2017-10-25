@@ -9,7 +9,7 @@
 
 typedef uint32_t PMSumUnit;
 
-PmsMeasurement::PmsMeasurement(Pms3003& pms, MeasureNumber measures, MeasureNumber warmupMeasures) :
+PmsMeasurement::PmsMeasurement(PmsX003& pms, MeasureNumber measures, MeasureNumber warmupMeasures) :
         pms(pms), warmupMeasuresNumber(warmupMeasures), measuresNumber(measures), measuresToCount(
                 measuresNumber - HIGH_MEASURES_DROP - LOW_MEASURES_DROP) {
 }

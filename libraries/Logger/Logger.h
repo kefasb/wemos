@@ -62,7 +62,7 @@ private:
     const LogLevel logLevel;
     char prefix[PREFIX_MAX_LENGTH + 1];
 
-    void logIt(const char* const severity, const char* const text, ...) const;
+    void logIt(const char* const severity, const char* const text, va_list args) const;
 
     bool isAllowedToLogOnLevel(LogLevel level) const;
 };

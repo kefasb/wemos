@@ -10,10 +10,10 @@
 #ifndef PMS3003_PMS3003MEASUREMENT_H_
 #define PMS3003_PMS3003MEASUREMENT_H_
 
+#include <PmsX003.h>
 #include <stdint.h>
 #include "EmptyData.h"
 #include "PmsData.h"
-#include "Pms3003.h"
 
 typedef uint8_t MeasureNumber;
 
@@ -28,7 +28,7 @@ public:
      * @param measures Number of measurements to calculate average from
      * @param warmupmeasures Number of warmup measurements
      */
-    PmsMeasurement(Pms3003& pms, MeasureNumber measures = 20, MeasureNumber warmupMeasures = 15);
+    PmsMeasurement(PmsX003& pms, MeasureNumber measures = 20, MeasureNumber warmupMeasures = 20);
 
     /**
      * desctructor
@@ -49,7 +49,7 @@ private:
     static const MeasureNumber HIGH_MEASURES_DROP = 2;
     static const MeasureNumber LOW_MEASURES_DROP = 2;
 
-    Pms3003& pms;
+    PmsX003& pms;
     const MeasureNumber warmupMeasuresNumber;
     const MeasureNumber measuresNumber;
     const MeasureNumber measuresToCount;

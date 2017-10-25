@@ -1,6 +1,6 @@
-#include <BlynkSimpleEsp8266.h>
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
+#include <SoftwareSerial.h>
 
 #include "Duration.h"
 #include "Logger.h"
@@ -8,7 +8,7 @@
 #include "SimpleWifiManager.h"
 #include "WifiConnectionData.h"
 
-#include "Pms3003.h"
+#include "PmsX003.h"
 #include "PmsMeasurement.h"
 #include "EmptyData.h"
 #include "PmsData.h"
@@ -18,14 +18,12 @@
 #include "HttpClient.h"
 #include "HttpConnectionData.h"
 
-uint32_t startTime;
-
-
 /* PMS settings */
-const uint8_t PMS_SET_PIN = D3;
+const uint8_t PMS_SET_PIN = D7;
 const uint32_t PMS_READ_INTERVAL = Duration::Minutes(4);
-Logger pmsLogger(Serial, "Pms3003", INFO);
-Pms3003 pms3003(Serial, PMS_SET_PIN, pmsLogger);
+Logger pmsLogger(Serial, "PmsX003", INFO);
+SoftwareSerial pmsSerial(D5, D6, false, 256);
+PmsX003 pmsX003(pmsSerial, PMS_SET_PIN, pmsLogger);
 PmsData lastPmsData = EmptyData();
 
 /* Http */
@@ -35,18 +33,12 @@ Logger httpLogger(Serial, "HttpClient", INFO);
 /* Wifi */
 WifiConnectionData wifiConnectionData;
 Logger simpleWifiManagerLogger(Serial, "SimpleWifiManger", INFO);
-SimpleWifiManager wifiManager = SimpleWifiManager(WiFi, wifiConnectionData, simpleWifiManagerLogger);
-
-/* Blynk settings */
-const uint8_t BLYNK_PM25_DISPLAY = V20;
-const uint8_t BLYNK_PM10_DISPLAY = V21;
-const uint8_t BLYNK_PREVIOUS_DISPLAY = V22;
-const char* authToken = httpConnectionData.blynkAuth;
+SimpleWifiManager wifiManager = SimpleWifiManager(WiFi, wifiConnectionData,
+        simpleWifiManagerLogger);
+WiFiClient client;
 
 /* Timers */
 Timers timers;
-
-WiFiClient client;
 
 bool connectWifi() {
     return wifiManager.connect();
@@ -57,21 +49,8 @@ void disconnectWifi() {
     client.stop();
 }
 
-bool connectBlynk() {
-    bool connected = false;
-    if (Blynk.connected()) {
-        if (Blynk.run()) {
-            connected = true;
-        }
-    } else {
-        Blynk.config(authToken);
-        connected = Blynk.connect();
-    }
-    return connected;
-}
-
 PmsData readPms() {
-    PmsMeasurement pmsMeasurement = PmsMeasurement(pms3003);
+    PmsMeasurement pmsMeasurement = PmsMeasurement(pmsX003);
     PmsData pmsData = pmsMeasurement.measure();
     if (pmsData == EmptyData()) {
         Serial.println("No data received");
@@ -100,17 +79,6 @@ void firstGatherPmsData() {
     timers.intervalTimer(PMS_READ_INTERVAL, gatherPmsData);
 }
 
-bool sendDataToBlynk() {
-    if (!connectBlynk()) {
-        Serial.println("Blynk connection failed.");
-        return false;
-    }
-
-    Blynk.virtualWrite(BLYNK_PM25_DISPLAY, lastPmsData.getPm25());
-    Blynk.virtualWrite(BLYNK_PM10_DISPLAY, lastPmsData.getPm10());
-    return true;
-}
-
 bool sendDataToHttp() {
     if (!client.connect(httpConnectionData.getHttpHost(), httpConnectionData.getHttpPort())) {
         Serial.println("Http connection failed");
@@ -124,20 +92,15 @@ bool sendDataToHttp() {
 
 void processPmsData() {
     static bool httpSent = false;
-    static bool blynkSent = true;
     bool processingEnd = false;
     if (lastPmsData != EmptyData()) {
         if (connectWifi()) {
             if (!httpSent && sendDataToHttp()) {
                 httpSent = true;
             }
-
-            if (!blynkSent && sendDataToBlynk()) {
-                blynkSent = true;
-            }
         }
 
-        if (httpSent && blynkSent) {
+        if (httpSent) {
             timers.timeoutTimer(Duration::Seconds(5), disconnectWifi);
             processingEnd = true;
         } else {
@@ -149,24 +112,37 @@ void processPmsData() {
 
         if (processingEnd) {
             httpSent = false;
-            //blynkSent = false;
             lastPmsData.print(Serial);
             lastPmsData = EmptyData();
         }
     }
 }
 
+void printData() {
+    if (EmptyData() == lastPmsData) {
+        return;
+    }
+    Serial.print("Pms data: ");
+    Serial.print("PM2.5: ");
+    Serial.print(lastPmsData.getPm25());
+    Serial.print("PM10: ");
+    Serial.print(lastPmsData.getPm10());
+    Serial.println();
+
+    lastPmsData = EmptyData();
+}
+
 void setup() {
     pinMode(PMS_SET_PIN, OUTPUT);
 
     Serial.begin(9600);
+    pmsSerial.begin(9600);
 
     WiFi.persistent(false);
 
-    startTime = millis();
-
     timers.timeoutTimer(Duration::Seconds(20), firstGatherPmsData);
     timers.intervalTimer(Duration::Seconds(5), processPmsData);
+    //timers.intervalTimer(Duration::Seconds(5), printData);
 }
 
 void loop() {

@@ -5,6 +5,7 @@
  *
  */
 
+#include <stdio.h>
 #include "Logger.h"
 
 constexpr char Logger::DEBUG_TXT[];
@@ -26,13 +27,12 @@ Logger::Logger(Print& out, LogLevel logLevel) :
 Logger::~Logger() {
 }
 
-void Logger::logIt(const char* const levelTxt, const char* const text, ...) const {
+void Logger::logIt(const char* const levelTxt, const char* const text, va_list args) const {
     out.print(levelTxt);
     out.print(prefix);
-    va_list args;
-    va_start(args, text);
-    out.printf(text, args);
-    va_end(args);
+    char buf[256];
+    vsnprintf(buf, 256, text, args);
+    out.print(buf);
     out.println();
 }
 
@@ -53,7 +53,7 @@ void Logger::logInfo(const char* const text, ...) const {
     if (isAllowedToLogOnLevel(INFO)) {
         va_list args;
         va_start(args, text);
-        logIt(INFO_TXT, text);
+        logIt(INFO_TXT, text, args);
         va_end(args);
     }
 }
@@ -62,7 +62,7 @@ void Logger::logError(const char* const text, ...) const {
     if (isAllowedToLogOnLevel(ERROR)) {
         va_list args;
         va_start(args, text);
-        logIt(ERROR_TXT, text);
+        logIt(ERROR_TXT, text, args);
         va_end(args);
     }
 }
