@@ -5,7 +5,6 @@
  */
 
 #include "HttpClient.h"
-#include <Arduino.h>
 
 HttpClient::HttpClient(Client& client, IHttpConnectionData& connectionData, ILogger& logger) :
         client(client), connectionData(connectionData), logger(logger) {

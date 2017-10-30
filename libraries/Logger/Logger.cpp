@@ -5,7 +5,6 @@
  *
  */
 
-#include <stdio.h>
 #include "Logger.h"
 
 constexpr char Logger::DEBUG_TXT[];

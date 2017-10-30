@@ -9,7 +9,7 @@
 #ifndef SIMPLEWIFIMANAGER_SIMPLEWIFIMANAGER_H_
 #define SIMPLEWIFIMANAGER_SIMPLEWIFIMANAGER_H_
 
-#include "ESP8266WiFi.h"
+#include <ESP8266WiFi.h>
 #include "Duration.h"
 #include "TimeoutTimer.h"
 #include "IWifiConnectionData.h"

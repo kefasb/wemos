@@ -1,12 +1,12 @@
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
-#include <SoftwareSerial.h>
+#include "EspSoftwareSerial/SoftwareSerial.h"
 
 #include "Duration.h"
 #include "Logger.h"
 
 #include "SimpleWifiManager.h"
-#include "WifiConnectionData.h"
+#include "../WifiConnectionData.h"
 
 #include "PmsX003.h"
 #include "PmsMeasurement.h"
@@ -16,7 +16,9 @@
 #include "Timers.h"
 
 #include "HttpClient.h"
-#include "HttpConnectionData.h"
+#include "../HttpConnectionData.h"
+
+Logger logger(Serial, "Powietrze", INFO);
 
 /* PMS settings */
 const uint8_t PMS_SET_PIN = D7;
@@ -53,7 +55,7 @@ PmsData readPms() {
     PmsMeasurement pmsMeasurement = PmsMeasurement(pmsX003);
     PmsData pmsData = pmsMeasurement.measure();
     if (pmsData == EmptyData()) {
-        Serial.println("No data received");
+        logger.logInfo("No data received");
     }
 
     return pmsData;
@@ -81,7 +83,7 @@ void firstGatherPmsData() {
 
 bool sendDataToHttp() {
     if (!client.connect(httpConnectionData.getHttpHost(), httpConnectionData.getHttpPort())) {
-        Serial.println("Http connection failed");
+        logger.logError("Http connection failed");
         return false;
     }
 
@@ -105,7 +107,7 @@ void processPmsData() {
             processingEnd = true;
         } else {
             if (isTimeout(retryTimeout, Duration::Minutes(1))) {
-                Serial.println("Unable to process pms data");
+                logger.logError("Unable to process pms data");
                 processingEnd = true;
             }
         }
