@@ -30,6 +30,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/thirdparty}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Timers}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TimeUtils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TempRh}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1588294519" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -46,6 +48,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/thirdparty}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Timers}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TimeUtils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TempRh}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.292301010" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -62,6 +66,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/thirdparty}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Timers}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TimeUtils}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TempRh}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1226419981" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

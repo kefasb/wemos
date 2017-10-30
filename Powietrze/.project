@@ -67,6 +67,11 @@
 			<locationURI>WORKSPACE_LOC/libraries/SimpleWifiManager</locationURI>
 		</link>
 		<link>
+			<name>libraries/TempRh</name>
+			<type>2</type>
+			<locationURI>WORKSPACE_LOC/libraries/TempRh</locationURI>
+		</link>
+		<link>
 			<name>libraries/TimeUtils</name>
 			<type>2</type>
 			<locationURI>WORKSPACE_LOC/libraries/TimeUtils</locationURI>
@@ -75,6 +80,11 @@
 			<name>libraries/Timers</name>
 			<type>2</type>
 			<locationURI>WORKSPACE_LOC/libraries/Timers</locationURI>
+		</link>
+		<link>
+			<name>libraries/Wire</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/esp8266/hardware/esp8266/2.3.0/libraries/Wire</locationURI>
 		</link>
 		<link>
 			<name>libraries/thirdparty</name>
