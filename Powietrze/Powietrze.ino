@@ -1,6 +1,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
 #include "EspSoftwareSerial/SoftwareSerial.h"
+#include "SparkFun_Si7021/src/Si7021.h"
 
 #include "Duration.h"
 #include "Logger.h"
@@ -40,7 +41,8 @@ SimpleWifiManager wifiManager = SimpleWifiManager(WiFi, wifiConnectionData,
 WiFiClient client;
 
 /* Timers */
-Timers timers;
+Logger timersLogger(Serial, "Timers", INFO);
+Timers timers(timersLogger);
 
 bool connectWifi() {
     return wifiManager.connect();
@@ -143,6 +145,7 @@ void setup() {
     WiFi.persistent(false);
 
     timers.timeoutTimer(Duration::Seconds(20), firstGatherPmsData);
+
     timers.intervalTimer(Duration::Seconds(5), processPmsData);
     //timers.intervalTimer(Duration::Seconds(5), printData);
 }
