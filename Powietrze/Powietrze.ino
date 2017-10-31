@@ -21,12 +21,12 @@
 #include "HttpClient.h"
 #include "../HttpConnectionData.h"
 
-Logger logger(Serial, "Powietrze", INFO);
+Logger logger(Serial, "Powietrze", LogLevel::INFO);
 
 /* PMS settings */
 static const uint8_t PMS_SET_PIN = D7;
 static const uint32_t PMS_READ_INTERVAL = Duration::Minutes(4);
-Logger pmsLogger(Serial, "PmsX003", INFO);
+Logger pmsLogger(Serial, "PmsX003", LogLevel::INFO);
 SoftwareSerial pmsSerial(D5, D6, false, 256);
 PmsX003 pmsX003(pmsSerial, PMS_SET_PIN, pmsLogger);
 static const PmsData emptyPmsPata = EmptyData();
@@ -34,17 +34,17 @@ PmsData lastPmsData = emptyPmsPata;
 
 /* Http */
 HttpConnectionData httpConnectionData;
-Logger httpLogger(Serial, "HttpClient", INFO);
+Logger httpLogger(Serial, "HttpClient", LogLevel::INFO);
 
 /* Wifi */
 WifiConnectionData wifiConnectionData;
-Logger simpleWifiManagerLogger(Serial, "SimpleWifiManger", INFO);
+Logger simpleWifiManagerLogger(Serial, "SimpleWifiManger", LogLevel::INFO);
 SimpleWifiManager wifiManager = SimpleWifiManager(WiFi, wifiConnectionData,
 		simpleWifiManagerLogger);
 WiFiClient client;
 
 /* Timers */
-Logger timersLogger(Serial, "Timers", INFO);
+Logger timersLogger(Serial, "Timers", LogLevel::INFO);
 Timers timers(timersLogger);
 
 /* Si7021 */

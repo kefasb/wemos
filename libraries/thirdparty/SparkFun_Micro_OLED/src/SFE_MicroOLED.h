@@ -49,27 +49,26 @@
 
 #define swap(a, b) { uint8_t t = a; a = b; b = t; }
 
-#define I2C_ADDRESS_SA0_0 0b0111100
-#define I2C_ADDRESS_SA0_1 0b0111101
-#define I2C_COMMAND 0x00
-#define I2C_DATA 0x40
+#define OLED_DEFAULT_ADDRESS 0b0111100
+#define OLED_ALTERNATIVE_ADDRESS 0b0111101
+#define OLED_I2C_COMMAND 0x00
+#define OLED_I2C_DATA 0x40
 
-#define BLACK 0
-#define WHITE 1
+enum class OledDrawColor {
+	BLACK = 0, WHITE = 1
+};
 
 #define LCDWIDTH			64
 #define LCDHEIGHT			48
 #define FONTHEADERSIZE		6
 
-#define NORM				0
-#define XOR					1
+enum class OledDrawMode {
+	NORM = 0, XOR = 1
+};
 
-#define PAGE				0
-#define ALL					1
-
-#define WIDGETSTYLE0			0
-#define WIDGETSTYLE1			1
-#define WIDGETSTYLE2			2
+enum class OledClearMode {
+	PAGE = 0, ALL = 1
+};
 
 #define SETCONTRAST 		0x81
 #define DISPLAYALLONRESUME 	0xA4
@@ -104,7 +103,7 @@
 #define VERTICALRIGHTHORIZONTALSCROLL	0x29
 #define VERTICALLEFTHORIZONTALSCROLL	0x2A
 
-typedef enum CMD {
+enum class OledCommand {
 	CMD_CLEAR,			//0
 	CMD_INVERT,			//1
 	CMD_CONTRAST,		//2
@@ -124,17 +123,17 @@ typedef enum CMD {
 	CMD_GETLCDHEIGHT,	//16
 	CMD_SETCOLOR,		//17
 	CMD_SETDRAWMODE		//18
-} commCommand_t;
+};
 
-typedef enum COMM_MODE {
+enum class OledCommunicationMode {
 	MODE_SPI, MODE_I2C, MODE_PARALLEL
-} micro_oled_mode;
+};
 
 class MicroOLED: public Print {
 public:
-	// Constructor(s)
+// Constructor(s)
 	MicroOLED(uint8_t rst, uint8_t dc, uint8_t cs);
-	MicroOLED(uint8_t rst, uint8_t dc);
+	MicroOLED(uint8_t rst, uint8_t i2cAdress);
 	MicroOLED(uint8_t rst, uint8_t dc, uint8_t cs, uint8_t wr, uint8_t rd,
 			uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4,
 			uint8_t d5, uint8_t d6, uint8_t d7);
@@ -142,52 +141,53 @@ public:
 	void begin(void);
 	virtual size_t write(uint8_t);
 
-	// RAW LCD functions
+// RAW LCD functions
 	void command(uint8_t c);
 	void data(uint8_t c);
 	void setColumnAddress(uint8_t add);
 	void setPageAddress(uint8_t add);
 
-	// LCD Draw functions
-	void clear(uint8_t mode);
-	void clear(uint8_t mode, uint8_t c);
+// LCD Draw functions
+	void clear(OledClearMode mode);
+	void clear(OledClearMode mode, uint8_t character);
 	void invert(boolean inv);
 	void contrast(uint8_t contrast);
 	void display(void);
 	void setCursor(uint8_t x, uint8_t y);
 	void pixel(uint8_t x, uint8_t y);
-	void pixel(uint8_t x, uint8_t y, uint8_t color, uint8_t mode);
+	void pixel(uint8_t x, uint8_t y, OledDrawColor color, OledDrawMode mode);
 	void line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
-	void line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color,
-			uint8_t mode);
+	void line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
+			OledDrawColor color, OledDrawMode mode);
 	void lineH(uint8_t x, uint8_t y, uint8_t width);
-	void lineH(uint8_t x, uint8_t y, uint8_t width, uint8_t color,
-			uint8_t mode);
+	void lineH(uint8_t x, uint8_t y, uint8_t width, OledDrawColor color,
+			OledDrawMode mode);
 	void lineV(uint8_t x, uint8_t y, uint8_t height);
-	void lineV(uint8_t x, uint8_t y, uint8_t height, uint8_t color,
-			uint8_t mode);
+	void lineV(uint8_t x, uint8_t y, uint8_t height, OledDrawColor color,
+			OledDrawMode mode);
 	void rect(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 	void rect(uint8_t x, uint8_t y, uint8_t width, uint8_t height,
-			uint8_t color, uint8_t mode);
+			OledDrawColor color, OledDrawMode mode);
 	void rectFill(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 	void rectFill(uint8_t x, uint8_t y, uint8_t width, uint8_t height,
-			uint8_t color, uint8_t mode);
+			OledDrawColor color, OledDrawMode mode);
 	void circle(uint8_t x, uint8_t y, uint8_t radius);
-	void circle(uint8_t x, uint8_t y, uint8_t radius, uint8_t color,
-			uint8_t mode);
+	void circle(uint8_t x, uint8_t y, uint8_t radius, OledDrawColor color,
+			OledDrawMode mode);
 	void circleFill(uint8_t x0, uint8_t y0, uint8_t radius);
-	void circleFill(uint8_t x0, uint8_t y0, uint8_t radius, uint8_t color,
-			uint8_t mode);
+	void circleFill(uint8_t x0, uint8_t y0, uint8_t radius, OledDrawColor color,
+			OledDrawMode mode);
 	void drawChar(uint8_t x, uint8_t y, uint8_t c);
-	void drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color, uint8_t mode);
+	void drawChar(uint8_t x, uint8_t y, uint8_t c, OledDrawColor color,
+			OledDrawMode mode);
 	void drawBitmap(uint8_t * bitArray);
 	uint8_t getLCDWidth(void);
 	uint8_t getLCDHeight(void);
-	void setColor(uint8_t color);
-	void setDrawMode(uint8_t mode);
+	void setColor(OledDrawColor color);
+	void setDrawMode(OledDrawMode mode);
 	uint8_t *getScreenBuffer(void);
 
-	// Font functions
+// Font functions
 	uint8_t getFontWidth(void);
 	uint8_t getFontHeight(void);
 	uint8_t getTotalFonts(void);
@@ -196,7 +196,7 @@ public:
 	uint8_t getFontStartChar(void);
 	uint8_t getFontTotalChar(void);
 
-	// LCD Rotate Scroll functions	
+// LCD Rotate Scroll functions
 	void scrollRight(uint8_t start, uint8_t stop);
 	void scrollLeft(uint8_t start, uint8_t stop);
 	void scrollVertRight(uint8_t start, uint8_t stop);
@@ -206,20 +206,23 @@ public:
 	void flipHorizontal(boolean flip);
 
 private:
-	uint8_t csPin, dcPin, rstPin;
+	const OledCommunicationMode interface;
+	const uint8_t i2c_address;
+	const uint8_t rstPin, dcPin, csPin;
 	uint8_t wrPin, rdPin, dPins[8];
 	volatile uint8_t *wrport, *wrreg, *rdport, *rdreg;
 	uint8_t wrpinmask, rdpinmask;
-	micro_oled_mode interface;
-	byte i2c_address;
 	volatile uint8_t *ssport, *dcport, *ssreg, *dcreg;// use volatile because these are fixed location port address
 	uint8_t mosipinmask, sckpinmask, sspinmask, dcpinmask;
-	uint8_t foreColor, drawMode, fontWidth, fontHeight, fontType, fontStartChar,
-			fontTotalChar, cursorX, cursorY;
+	OledDrawMode drawMode;
+	OledDrawColor foreColor;
+	uint8_t fontWidth, fontHeight, fontType, fontStartChar, fontTotalChar,
+			cursorX, cursorY;
 	uint16_t fontMapWidth;
 	static const unsigned char *fontsPointer[];
+	OledDrawColor invertColor(OledDrawColor color);
 
-	// Communication
+// Communication
 	void spiTransfer(byte data);
 	void spiSetup();
 	void i2cSetup();

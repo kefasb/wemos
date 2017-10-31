@@ -153,12 +153,9 @@ static uint8_t screenmemory[] = {
  Setup the MicroOLED class, configure the display to be controlled via a
  SPI interface.
  */
-MicroOLED::MicroOLED(uint8_t rst, uint8_t dc, uint8_t cs) {
-	// Assign each of the parameters to a private class variable.
-	rstPin = rst;
-	dcPin = dc;
-	csPin = cs;
-	interface = MODE_SPI;	// Set interface mode to SPI
+MicroOLED::MicroOLED(uint8_t rst, uint8_t dc, uint8_t cs) :
+		interface(OledCommunicationMode::MODE_SPI), i2c_address(0), rstPin(rst), dcPin(
+				dc), csPin(cs) {
 }
 
 /** \brief MicroOLED Constructor -- I2C Mode
@@ -166,16 +163,9 @@ MicroOLED::MicroOLED(uint8_t rst, uint8_t dc, uint8_t cs) {
  Setup the MicroOLED class, configure the display to be controlled via a
  I2C interface.
  */
-MicroOLED::MicroOLED(uint8_t rst, uint8_t dc) {
-	rstPin = rst;	// Assign reset pin to private class variable
-	interface = MODE_I2C;	// Set interface to I2C
-	// Set the I2C Address based on whether DC is high (1) or low (0).
-	// The pin is pulled low by default, so if it's not explicitly set to
-	// 1, just default to 0.
-	if (dc == 1)
-		i2c_address = I2C_ADDRESS_SA0_1;
-	else
-		i2c_address = I2C_ADDRESS_SA0_0;
+MicroOLED::MicroOLED(uint8_t rst, uint8_t i2cAddress) :
+		interface(OledCommunicationMode::MODE_I2C), i2c_address(i2cAddress), rstPin(
+				rst), dcPin(255), csPin(255) {
 }
 
 /** \brief MicroOLED Constructor -- Parallel Mode
@@ -185,12 +175,10 @@ MicroOLED::MicroOLED(uint8_t rst, uint8_t dc) {
  */
 MicroOLED::MicroOLED(uint8_t rst, uint8_t dc, uint8_t cs, uint8_t wr,
 		uint8_t rd, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4,
-		uint8_t d5, uint8_t d6, uint8_t d7) {
-	interface = MODE_PARALLEL;	// Set to parallel mode
-	// Assign pin parameters to private class variables.
-	rstPin = rst;
-	dcPin = dc;
-	csPin = cs;
+		uint8_t d5, uint8_t d6, uint8_t d7) :
+		interface(OledCommunicationMode::MODE_PARALLEL), i2c_address(0), rstPin(
+				rst), dcPin(dc), csPin(cs) {
+
 	wrPin = wr;
 	rdPin = rd;
 	dPins[0] = d0;
@@ -210,19 +198,19 @@ MicroOLED::MicroOLED(uint8_t rst, uint8_t dc, uint8_t cs, uint8_t wr,
 void MicroOLED::begin() {
 	// default 5x7 font
 	setFontType(0);
-	setColor(WHITE);
-	setDrawMode(NORM);
+	setColor(OledDrawColor::WHITE);
+	setDrawMode(OledDrawMode::NORM);
 	setCursor(0, 0);
 
 	pinMode(rstPin, OUTPUT);
 
 	// Set up the selected interface:
-	if (interface == MODE_SPI) {
+	if (OledCommunicationMode::MODE_SPI == interface) {
 		pinMode(dcPin, OUTPUT);
 		spiSetup();
-	} else if (interface == MODE_I2C)
+	} else if (OledCommunicationMode::MODE_I2C == interface)
 		i2cSetup();
-	else if (interface == MODE_PARALLEL) {
+	else if (OledCommunicationMode::MODE_PARALLEL == interface) {
 		pinMode(dcPin, OUTPUT);
 		parallelSetup();
 	}
@@ -271,7 +259,7 @@ void MicroOLED::begin() {
 	command(0x40);
 
 	command(DISPLAYON);				//--turn on oled panel
-	clear(ALL);	// Erase hardware memory inside the OLED controller to avoid random data in memory.
+	clear(OledClearMode::ALL);// Erase hardware memory inside the OLED controller to avoid random data in memory.
 }
 
 /** \brief Send the display a command byte
@@ -283,15 +271,15 @@ void MicroOLED::begin() {
  */
 void MicroOLED::command(uint8_t c) {
 
-	if (interface == MODE_SPI) {
+	if (OledCommunicationMode::MODE_SPI == interface) {
 		digitalWrite(dcPin, LOW);
 		;	// DC pin LOW for a command
 		spiTransfer(c);			// Transfer the command byte
-	} else if (interface == MODE_I2C) {
+	} else if (OledCommunicationMode::MODE_I2C == interface) {
 		// Write to our address, make sure it knows we're sending a
 		// command:
-		i2cWrite(i2c_address, I2C_COMMAND, c);
-	} else if (interface == MODE_PARALLEL) {
+		i2cWrite(i2c_address, OLED_I2C_COMMAND, c);
+	} else if (OledCommunicationMode::MODE_PARALLEL == interface) {
 		// Write the byte to our parallel interface. Set DC LOW.
 		parallelWrite(c, LOW);
 	}
@@ -306,15 +294,15 @@ void MicroOLED::command(uint8_t c) {
  */
 void MicroOLED::data(uint8_t c) {
 
-	if (interface == MODE_SPI) {
+	if (OledCommunicationMode::MODE_SPI == interface) {
 		digitalWrite(dcPin, HIGH);	// DC HIGH for a data byte
 
 		spiTransfer(c); 		// Transfer the data byte
-	} else if (interface == MODE_I2C) {
+	} else if (OledCommunicationMode::MODE_I2C == interface) {
 		// Write to our address, make sure it knows we're sending a
 		// data byte:
-		i2cWrite(i2c_address, I2C_DATA, c);
-	} else if (interface == MODE_PARALLEL) {
+		i2cWrite(i2c_address, OLED_I2C_DATA, c);
+	} else if (OledCommunicationMode::MODE_PARALLEL == interface) {
 		// Write the byte to our parallel interface. Set DC HIGH.
 		parallelWrite(c, HIGH);
 	}
@@ -344,9 +332,9 @@ void MicroOLED::setColumnAddress(uint8_t add) {
 
  To clear GDRAM inside the LCD controller, pass in the variable mode = ALL and to clear screen page buffer pass in the variable mode = PAGE.
  */
-void MicroOLED::clear(uint8_t mode) {
+void MicroOLED::clear(OledClearMode mode) {
 	//	uint8_t page=6, col=0x40;
-	if (mode == ALL) {
+	if (OledClearMode::ALL == mode) {
 		for (int i = 0; i < 8; i++) {
 			setPageAddress(i);
 			setColumnAddress(0);
@@ -364,18 +352,18 @@ void MicroOLED::clear(uint8_t mode) {
 
  To clear GDRAM inside the LCD controller, pass in the variable mode = ALL with c character and to clear screen page buffer, pass in the variable mode = PAGE with c character.
  */
-void MicroOLED::clear(uint8_t mode, uint8_t c) {
+void MicroOLED::clear(OledClearMode mode, uint8_t character) {
 	//uint8_t page=6, col=0x40;
-	if (mode == ALL) {
+	if (OledClearMode::ALL == mode) {
 		for (int i = 0; i < 8; i++) {
 			setPageAddress(i);
 			setColumnAddress(0);
 			for (int j = 0; j < 0x80; j++) {
-				data(c);
+				data(character);
 			}
 		}
 	} else {
-		memset(screenmemory, c, 384);			// (64 x 48) / 8 = 384
+		memset(screenmemory, character, 384);			// (64 x 48) / 8 = 384
 		display();
 	}
 }
@@ -459,18 +447,22 @@ void MicroOLED::pixel(uint8_t x, uint8_t y) {
 
  Draw color pixel in the screen buffer's x,y position with NORM or XOR draw mode.
  */
-void MicroOLED::pixel(uint8_t x, uint8_t y, uint8_t color, uint8_t mode) {
-	if ((x < 0) || (x >= LCDWIDTH) || (y < 0) || (y >= LCDHEIGHT))
+void MicroOLED::pixel(uint8_t x, uint8_t y, OledDrawColor color,
+		OledDrawMode mode) {
+	if ((x >= LCDWIDTH) || (y >= LCDHEIGHT)) {
 		return;
+	}
 
-	if (mode == XOR) {
-		if (color == WHITE)
+	if (OledDrawMode::XOR == mode) {
+		if (OledDrawColor::WHITE == color) {
 			screenmemory[x + (y / 8) * LCDWIDTH] ^= _BV((y % 8));
+		}
 	} else {
-		if (color == WHITE)
+		if (OledDrawColor::WHITE == color) {
 			screenmemory[x + (y / 8) * LCDWIDTH] |= _BV((y % 8));
-		else
+		} else {
 			screenmemory[x + (y / 8) * LCDWIDTH] &= ~_BV((y % 8));
+		}
 	}
 }
 
@@ -487,7 +479,7 @@ void MicroOLED::line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
  Draw line using color and mode from x0,y0 to x1,y1 of the screen buffer.
  */
 void MicroOLED::line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
-		uint8_t color, uint8_t mode) {
+		OledDrawColor color, OledDrawMode mode) {
 	uint8_t steep = abs(y1 - y0) > abs(x1 - x0);
 	if (steep) {
 		swap(x0, y0);
@@ -538,8 +530,8 @@ void MicroOLED::lineH(uint8_t x, uint8_t y, uint8_t width) {
 
  Draw horizontal line using color and mode from x,y to x+width,y of the screen buffer.
  */
-void MicroOLED::lineH(uint8_t x, uint8_t y, uint8_t width, uint8_t color,
-		uint8_t mode) {
+void MicroOLED::lineH(uint8_t x, uint8_t y, uint8_t width, OledDrawColor color,
+		OledDrawMode mode) {
 	line(x, y, x + width, y, color, mode);
 }
 
@@ -555,8 +547,8 @@ void MicroOLED::lineV(uint8_t x, uint8_t y, uint8_t height) {
 
  Draw vertical line using color and mode from x,y to x,y+height of the screen buffer.
  */
-void MicroOLED::lineV(uint8_t x, uint8_t y, uint8_t height, uint8_t color,
-		uint8_t mode) {
+void MicroOLED::lineV(uint8_t x, uint8_t y, uint8_t height, OledDrawColor color,
+		OledDrawMode mode) {
 	line(x, y, x, y + height, color, mode);
 }
 
@@ -573,7 +565,7 @@ void MicroOLED::rect(uint8_t x, uint8_t y, uint8_t width, uint8_t height) {
  Draw rectangle using color and mode from x,y to x+width,y+height of the screen buffer.
  */
 void MicroOLED::rect(uint8_t x, uint8_t y, uint8_t width, uint8_t height,
-		uint8_t color, uint8_t mode) {
+		OledDrawColor color, OledDrawMode mode) {
 	uint8_t tempHeight;
 
 	lineH(x, y, width, color, mode);
@@ -603,7 +595,7 @@ void MicroOLED::rectFill(uint8_t x, uint8_t y, uint8_t width, uint8_t height) {
  Draw filled rectangle using color and mode from x,y to x+width,y+height of the screen buffer.
  */
 void MicroOLED::rectFill(uint8_t x, uint8_t y, uint8_t width, uint8_t height,
-		uint8_t color, uint8_t mode) {
+		OledDrawColor color, OledDrawMode mode) {
 	// TODO - need to optimise the memory map draw so that this function will not call pixel one by one
 	for (int i = x; i < x + width; i++) {
 		lineV(i, y, height, color, mode);
@@ -622,8 +614,8 @@ void MicroOLED::circle(uint8_t x0, uint8_t y0, uint8_t radius) {
 
  Draw circle with radius using color and mode at x,y of the screen buffer.
  */
-void MicroOLED::circle(uint8_t x0, uint8_t y0, uint8_t radius, uint8_t color,
-		uint8_t mode) {
+void MicroOLED::circle(uint8_t x0, uint8_t y0, uint8_t radius,
+		OledDrawColor color, OledDrawMode mode) {
 	//TODO - find a way to check for no overlapping of pixels so that XOR draw mode will work perfectly
 	int8_t f = 1 - radius;
 	int8_t ddF_x = 1;
@@ -672,7 +664,7 @@ void MicroOLED::circleFill(uint8_t x0, uint8_t y0, uint8_t radius) {
  Draw filled circle with radius using color and mode at x,y of the screen buffer.
  */
 void MicroOLED::circleFill(uint8_t x0, uint8_t y0, uint8_t radius,
-		uint8_t color, uint8_t mode) {
+		OledDrawColor color, OledDrawMode mode) {
 	// TODO - - find a way to check for no overlapping of pixels so that XOR draw mode will work perfectly
 	int8_t f = 1 - radius;
 	int8_t ddF_x = 1;
@@ -681,8 +673,9 @@ void MicroOLED::circleFill(uint8_t x0, uint8_t y0, uint8_t radius,
 	int8_t y = radius;
 
 	// Temporary disable fill circle for XOR mode.
-	if (mode == XOR)
+	if (OledDrawMode::XOR == mode) {
 		return;
+	}
 
 	for (uint8_t i = y0 - radius; i <= y0 + radius; i++) {
 		pixel(x0, i, color, mode);
@@ -778,8 +771,9 @@ uint8_t MicroOLED::getFontType(void) {
  Set the current font type number, ie changing to different fonts base on the type provided.
  */
 uint8_t MicroOLED::setFontType(uint8_t type) {
-	if ((type >= TOTALFONTS) || (type < 0))
+	if (type >= TOTALFONTS) {
 		return false;
+	}
 
 	fontType = type;
 	fontWidth = pgm_read_byte(fontsPointer[fontType] + 0);
@@ -795,7 +789,7 @@ uint8_t MicroOLED::setFontType(uint8_t type) {
 
  Set the current draw's color. Only WHITE and BLACK available.
  */
-void MicroOLED::setColor(uint8_t color) {
+void MicroOLED::setColor(OledDrawColor color) {
 	foreColor = color;
 }
 
@@ -803,7 +797,7 @@ void MicroOLED::setColor(uint8_t color) {
 
  Set current draw mode with NORM or XOR.
  */
-void MicroOLED::setDrawMode(uint8_t mode) {
+void MicroOLED::setDrawMode(OledDrawMode mode) {
 	drawMode = mode;
 }
 
@@ -815,12 +809,17 @@ void MicroOLED::drawChar(uint8_t x, uint8_t y, uint8_t c) {
 	drawChar(x, y, c, foreColor, drawMode);
 }
 
+OledDrawColor MicroOLED::invertColor(OledDrawColor color) {
+	return OledDrawColor::BLACK == color ?
+			OledDrawColor::WHITE : OledDrawColor::BLACK;
+}
+
 /** \brief Draw character with color and mode.
 
  Draw character c using color and draw mode at x,y.
  */
-void MicroOLED::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color,
-		uint8_t mode) {
+void MicroOLED::drawChar(uint8_t x, uint8_t y, uint8_t c, OledDrawColor color,
+		OledDrawMode mode) {
 	// TODO - New routine to take font of any height, at the moment limited to font height in multiple of 8 pixels
 
 	uint8_t rowsToDraw, row, tempC;
@@ -852,7 +851,7 @@ void MicroOLED::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color,
 				if (temp & 0x1) {
 					pixel(x + i, y + j, color, mode);
 				} else {
-					pixel(x + i, y + j, !color, mode);
+					pixel(x + i, y + j, invertColor(color), mode);
 				}
 
 				temp >>= 1;
@@ -879,7 +878,7 @@ void MicroOLED::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color,
 				if (temp & 0x1) {
 					pixel(x + i, y + j + (row * 8), color, mode);
 				} else {
-					pixel(x + i, y + j + (row * 8), !color, mode);
+					pixel(x + i, y + j + (row * 8), invertColor(color), mode);
 				}
 				temp >>= 1;
 			}
