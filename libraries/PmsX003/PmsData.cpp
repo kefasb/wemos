@@ -52,3 +52,10 @@ void PmsData::print(Print& out) const {
     out.print("PM10: ");
     out.println(getPm10());
 }
+
+void PmsData::printPm25AndPm10(Print& out) const {
+    out.print("PM25: ");
+    out.println(getPm25());
+    out.print("PM10: ");
+    out.println(getPm10());
+}

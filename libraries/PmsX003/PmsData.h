@@ -46,6 +46,7 @@ public:
      * Prints containing values on the given Print interface.
      */
     void print(Print& out) const;
+    void printPm25AndPm10(Print& out) const;
 
 private:
     PMUnit pm01;

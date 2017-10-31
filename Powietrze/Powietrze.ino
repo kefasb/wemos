@@ -30,8 +30,8 @@ static const uint32_t PMS_READ_INTERVAL = Duration::Minutes(4);
 Logger pmsLogger(Serial, "PmsX003", LogLevel::INFO);
 SoftwareSerial pmsSerial(D5, D6, false, 256);
 PmsX003 pmsX003(pmsSerial, PMS_SET_PIN, pmsLogger);
-static const PmsData emptyPmsPata = EmptyData();
-PmsData lastPmsData = emptyPmsPata;
+static const PmsData emptyPmsData = EmptyData();
+PmsData lastPmsData = emptyPmsData;
 
 /* Http */
 HttpConnectionData httpConnectionData;
@@ -84,7 +84,7 @@ TempRhData readSi() {
 }
 
 void clearWeatherData() {
-    lastPmsData = emptyPmsPata;
+    lastPmsData = emptyPmsData;
     lastSiData = emptySiData;
 }
 
@@ -124,7 +124,7 @@ bool sendDataToHttp() {
 void processWeatherData() {
     static bool httpSent = false;
     bool processingEnd = false;
-    if (lastPmsData != emptyPmsPata) {
+    if (lastPmsData != emptyPmsData) {
         if (connectWifi()) {
             if (!httpSent && sendDataToHttp()) {
                 httpSent = true;
@@ -150,19 +150,34 @@ void processWeatherData() {
 }
 
 void printData() {
-    static uint8_t count = 0;
-    if (emptyPmsPata == lastPmsData) {
+    static uint16_t count = 0;
+    if (emptyPmsData == lastPmsData && emptySiData == lastSiData) {
         return;
     }
-    logger.logInfo("PM2.5: %u, PM10: %u", lastPmsData.getPm25(),
-            lastPmsData.getPm10());
-    logger.logInfo("Temp: %f, RH: %f", lastSiData.getTemp(),
-            lastSiData.getRh());
-
     oled.clear(OledClearMode::PAGE);
+    oled.setFontType(0);
     oled.setCursor(0, 0);
     oled.println(++count);
-    lastPmsData.print(oled);
+
+    if (emptyPmsData != lastPmsData) {
+        logger.logInfo("PM2.5: %u, PM10: %u", lastPmsData.getPm25(),
+                lastPmsData.getPm10());
+
+        lastPmsData.printPm25AndPm10(oled);
+    }
+
+    oled.println();
+
+    if (emptySiData != lastSiData) {
+        logger.logInfo("Temp: %f, RH: %f", lastSiData.getTemp(),
+                lastSiData.getRh());
+
+        String temp(lastSiData.getTemp(), 1);
+        String rh(lastSiData.getRh(), 1);
+        oled.printf("T  %5s C", temp.c_str());
+        oled.printf("RH %5s %%", rh.c_str());
+    }
+
     oled.display();
 
     clearWeatherData();
@@ -170,16 +185,34 @@ void printData() {
 
 void fakeData() {
     lastPmsData = PmsData(0, random(100), random(200));
+    float temp = random(-60, 120);
+    float rh = random(300);
+    lastSiData = TempRhData(temp / 3.0f, rh / 3.0f);
+}
+
+void countDown() {
+    static int8_t count = 10;
+    if (count >= 0) {
+        oled.clear(OledClearMode::PAGE);
+        oled.setFontType(3);
+        oled.setCursor(24, 0);
+        oled.print(count--);
+        oled.display();
+    } else if (count-- == -1) {
+        oled.clear(OledClearMode::ALL);
+        oled.clear(OledClearMode::PAGE);
+    }
 }
 
 void setup() {
     pinMode(PMS_SET_PIN, OUTPUT);
 
     Serial.begin(9600);
-    //pmsSerial.begin(9600);
+    pmsSerial.begin(9600);
 
     oled.begin();
     oled.clear(OledClearMode::ALL);
+    timers.intervalTimer(Duration::Seconds(1), countDown, 15);
 
     WiFi.persistent(false);
 
