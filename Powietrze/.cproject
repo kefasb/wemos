@@ -14,9 +14,9 @@
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildProperties="" description="" id="io.sloeber.core.toolChain.release.137624631" name="Release" parent="org.eclipse.cdt.build.core.emptycfg">
 					<folderInfo id="io.sloeber.core.toolChain.release.137624631.1183077078" name="/" resourcePath="">
-						<toolChain id="io.sloeber.core.toolChain.release.1778085328" name="Arduino Toolchain (Sloeber edition)" superClass="io.sloeber.core.toolChain.release">
+						<toolChain id="io.sloeber.core.toolChain.release.1778085328" name="Arduino Toolchain (Sloeber edition)" nonInternalBuilderId="io.sloeber.sketch.builder" superClass="io.sloeber.core.toolChain.release">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="io.sloeber.targetplatform.940328009" name="Arduino Target" osList="all" superClass="io.sloeber.targetplatform"/>
-							<builder buildPath="${workspace_loc:/Powietrze}/Release" id="io.sloeber.sketch.builder.882874547" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Arduino sketch builder" superClass="io.sloeber.sketch.builder"/>
+							<builder buildPath="${workspace_loc:/Powietrze}/Release" command="/usr/bin/make" id="io.sloeber.sketch.builder.1554043323" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" superClass="io.sloeber.sketch.builder"/>
 							<tool id="io.sloeber.tool.sketch.compiler.cpp.889942986" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
 								<option id="io.sloeber.compiler.cpp.sketch.option.incpath.1702130020" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/core/core}&quot;"/>
@@ -32,6 +32,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TimeUtils}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TempRh}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/SPI}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1588294519" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -50,6 +51,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TimeUtils}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TempRh}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/SPI}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.292301010" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -68,6 +70,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TimeUtils}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/TempRh}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Powietrze/libraries/SPI}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1226419981" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
@@ -92,6 +95,10 @@
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/Powietrze"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

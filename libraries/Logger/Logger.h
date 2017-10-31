@@ -19,7 +19,7 @@
 #include "ILogger.h"
 
 enum LogLevel {
-    NONE = -1, ERROR = 5, INFO = 10, DEBUG = 15, ALL = 100
+    NONE = -1, ERROR = 5, INFO = 10, DEBUG = 15, ALLL = 100
 };
 
 class Logger: public ILogger {
