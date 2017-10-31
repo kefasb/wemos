@@ -1,8 +1,9 @@
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
+#include <SparkFun_Micro_OLED/src/I2cCommunicationOled.h>
 #include "EspSoftwareSerial/SoftwareSerial.h"
 #include "SparkFun_Si7021/src/Si7021.h"
-
+#include "SparkFun_Micro_OLED/src/SFE_MicroOLED.h"
 #include "Duration.h"
 #include "Logger.h"
 
@@ -40,7 +41,7 @@ Logger httpLogger(Serial, "HttpClient", LogLevel::INFO);
 WifiConnectionData wifiConnectionData;
 Logger simpleWifiManagerLogger(Serial, "SimpleWifiManger", LogLevel::INFO);
 SimpleWifiManager wifiManager = SimpleWifiManager(WiFi, wifiConnectionData,
-		simpleWifiManagerLogger);
+        simpleWifiManagerLogger);
 WiFiClient client;
 
 /* Timers */
@@ -52,126 +53,145 @@ static const TempRhData emptySiData = TempRhData();
 TempRhData lastSiData = emptySiData;
 Si7021 si7021;
 
+/* OLED */
+I2cCommunicationOled i2cCommunicationOled;
+MicroOLED oled(i2cCommunicationOled, 255);
+
 bool connectWifi() {
-	return wifiManager.connect();
+    return wifiManager.connect();
 }
 
 void disconnectWifi() {
-	wifiManager.disconnectAndOff();
-	client.stop();
+    wifiManager.disconnectAndOff();
+    client.stop();
 }
 
 PmsData readPms() {
-	PmsMeasurement pmsMeasurement = PmsMeasurement(pmsX003);
-	PmsData pmsData = pmsMeasurement.measure();
-	if (pmsData == EmptyData()) {
-		logger.logInfo("No data received");
-	}
+    PmsMeasurement pmsMeasurement = PmsMeasurement(pmsX003);
+    PmsData pmsData = pmsMeasurement.measure();
+    if (pmsData == EmptyData()) {
+        logger.logInfo("No data received");
+    }
 
-	return pmsData;
+    return pmsData;
 }
 
 TempRhData readSi() {
-	float rh = si7021.getRH();
-	float temp = si7021.readTemp();
-	lastSiData = TempRhData(temp, rh);
-	return lastSiData;
+    float rh = si7021.getRH();
+    float temp = si7021.readTemp();
+    lastSiData = TempRhData(temp, rh);
+    return lastSiData;
 }
 
 void clearWeatherData() {
-	lastPmsData = emptyPmsPata;
-	lastSiData = emptySiData;
+    lastPmsData = emptyPmsPata;
+    lastSiData = emptySiData;
 }
 
 bool isTimeout(uint32_t timer, uint32_t length) {
-	return millis() - timer >= length;
+    return millis() - timer >= length;
 }
 
 void resetTimer(uint32_t& timer) {
-	timer = millis();
+    timer = millis();
 }
 
 uint32_t retryTimeout;
 
 void gatherWeatherData() {
-	lastPmsData = readPms();
-	lastSiData = readSi();
-	resetTimer(retryTimeout);
+    lastPmsData = readPms();
+    lastSiData = readSi();
+    resetTimer(retryTimeout);
 }
 
 void firstGatherWeatherData() {
-	gatherWeatherData();
-	timers.intervalTimer(PMS_READ_INTERVAL, gatherWeatherData);
+    gatherWeatherData();
+    timers.intervalTimer(PMS_READ_INTERVAL, gatherWeatherData);
 }
 
 bool sendDataToHttp() {
-	if (!client.connect(httpConnectionData.getHttpHost(),
-			httpConnectionData.getHttpPort())) {
-		logger.logError("Http connection failed");
-		return false;
-	}
+    if (!client.connect(httpConnectionData.getHttpHost(),
+            httpConnectionData.getHttpPort())) {
+        logger.logError("Http connection failed");
+        return false;
+    }
 
-	HttpClient http(client, httpConnectionData, httpLogger);
-	http.sendGetRequest(0, 2, 0, lastPmsData.getPm25(), lastPmsData.getPm10());
-	return true;
+    HttpClient http(client, httpConnectionData, httpLogger);
+    http.sendGetRequest(0, 2, 0, lastPmsData.getPm25(), lastPmsData.getPm10());
+    return true;
 }
 
 void processWeatherData() {
-	static bool httpSent = false;
-	bool processingEnd = false;
-	if (lastPmsData != emptyPmsPata) {
-		if (connectWifi()) {
-			if (!httpSent && sendDataToHttp()) {
-				httpSent = true;
-			}
-		}
+    static bool httpSent = false;
+    bool processingEnd = false;
+    if (lastPmsData != emptyPmsPata) {
+        if (connectWifi()) {
+            if (!httpSent && sendDataToHttp()) {
+                httpSent = true;
+            }
+        }
 
-		if (httpSent) {
-			timers.timeoutTimer(Duration::Seconds(5), disconnectWifi);
-			processingEnd = true;
-		} else {
-			if (isTimeout(retryTimeout, Duration::Minutes(1))) {
-				logger.logError("Unable to process weather data");
-				processingEnd = true;
-			}
-		}
+        if (httpSent) {
+            timers.timeoutTimer(Duration::Seconds(5), disconnectWifi);
+            processingEnd = true;
+        } else {
+            if (isTimeout(retryTimeout, Duration::Minutes(1))) {
+                logger.logError("Unable to process weather data");
+                processingEnd = true;
+            }
+        }
 
-		if (processingEnd) {
-			httpSent = false;
-			lastPmsData.print(Serial);
-			clearWeatherData();
-		}
-	}
+        if (processingEnd) {
+            httpSent = false;
+            lastPmsData.print(Serial);
+            clearWeatherData();
+        }
+    }
 }
 
 void printData() {
-	if (emptyPmsPata == lastPmsData) {
-		return;
-	}
-	logger.logInfo("PM2.5: %u, PM10: %u", lastPmsData.getPm25(),
-			lastPmsData.getPm10());
-	logger.logInfo("Temp: %f, RH: %f", lastSiData.getTemp(),
-			lastSiData.getRh());
+    static uint8_t count = 0;
+    if (emptyPmsPata == lastPmsData) {
+        return;
+    }
+    logger.logInfo("PM2.5: %u, PM10: %u", lastPmsData.getPm25(),
+            lastPmsData.getPm10());
+    logger.logInfo("Temp: %f, RH: %f", lastSiData.getTemp(),
+            lastSiData.getRh());
 
-	clearWeatherData();
+    oled.clear(OledClearMode::PAGE);
+    oled.setCursor(0, 0);
+    oled.println(++count);
+    lastPmsData.print(oled);
+    oled.display();
+
+    clearWeatherData();
+}
+
+void fakeData() {
+    lastPmsData = PmsData(0, random(100), random(200));
 }
 
 void setup() {
-	pinMode(PMS_SET_PIN, OUTPUT);
+    pinMode(PMS_SET_PIN, OUTPUT);
 
-	Serial.begin(9600);
-	pmsSerial.begin(9600);
+    Serial.begin(9600);
+    //pmsSerial.begin(9600);
 
-	WiFi.persistent(false);
+    oled.begin();
+    oled.clear(OledClearMode::ALL);
 
-	timers.timeoutTimer(Duration::Seconds(20), firstGatherWeatherData);
-	timers.intervalTimer(Duration::Seconds(5), processWeatherData);
-	//timers.intervalTimer(Duration::Seconds(5), printData);
+    WiFi.persistent(false);
+
+    //timers.timeoutTimer(Duration::Seconds(20), firstGatherWeatherData);
+    //timers.intervalTimer(Duration::Seconds(5), processWeatherData);
+    timers.intervalTimer(Duration::Seconds(30), fakeData);
+    timers.intervalTimer(Duration::Seconds(5), printData);
 }
 
 void loop() {
-	timers.tick();
+    timers.tick();
 
-	delay(100);
+    delay(100);
 }
 

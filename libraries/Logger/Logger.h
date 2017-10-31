@@ -19,54 +19,54 @@
 #include "ILogger.h"
 
 enum class LogLevel {
-	NONE = -1, ERROR = 5, INFO = 10, DEBUG = 15, ALL = 100
+    NONE = -1, ERROR = 5, INFO = 10, DEBUG = 15, ALL = 100
 };
 
 class Logger: public ILogger {
 public:
-	/**
-	 * Creates logger that will send logs to provided Print interface and will include
-	 * provided className in log.
-	 * @param out Print interface to be used to send logs to
-	 * @param className Class name to be used for logs
-	 * @param logLevel Logging level the logger will be created with
-	 */
-	Logger(Print& out, const char* const className, LogLevel logLevel =
-			LogLevel::INFO);
+    /**
+     * Creates logger that will send logs to provided Print interface and will include
+     * provided className in log.
+     * @param out Print interface to be used to send logs to
+     * @param className Class name to be used for logs
+     * @param logLevel Logging level the logger will be created with
+     */
+    Logger(Print& out, const char* const className, LogLevel logLevel =
+            LogLevel::INFO);
 
-	/**
-	 * Creates logger that will send logs to provided Print interface.
-	 * @param out Print interface to be used to send logs to
-	 * @param logLevel Logging level the logger will be created with
-	 */
-	Logger(Print& out, LogLevel logLevel = LogLevel::INFO);
+    /**
+     * Creates logger that will send logs to provided Print interface.
+     * @param out Print interface to be used to send logs to
+     * @param logLevel Logging level the logger will be created with
+     */
+    Logger(Print& out, LogLevel logLevel = LogLevel::INFO);
 
-	/**
-	 * destructor
-	 */
-	virtual ~Logger();
+    /**
+     * destructor
+     */
+    virtual ~Logger();
 
-	void logDebug(const char* const text, ...) const override;
+    void logDebug(const char* const text, ...) const override;
 
-	void logInfo(const char* const text, ...) const override;
+    void logInfo(const char* const text, ...) const override;
 
-	void logError(const char* const text, ...) const override;
+    void logError(const char* const text, ...) const override;
 
 private:
-	static constexpr char DEBUG_TXT[] = "[DEBUG] ";
-	static constexpr char INFO_TXT[] = "[INFO] ";
-	static constexpr char ERROR_TXT[] = "[ERROR] ";
-	static const uint8_t PREFIX_MAX_LENGTH = 22;
-	static const uint8_t CLASS_NAME_MAX_LENGTH = 20;
+    static constexpr char DEBUG_TXT[] = "[DEBUG] ";
+    static constexpr char INFO_TXT[] = "[INFO] ";
+    static constexpr char ERROR_TXT[] = "[ERROR] ";
+    static const uint8_t PREFIX_MAX_LENGTH = 22;
+    static const uint8_t CLASS_NAME_MAX_LENGTH = 20;
 
-	Print& out;
-	const LogLevel logLevel;
-	char prefix[PREFIX_MAX_LENGTH + 1];
+    Print& out;
+    const LogLevel logLevel;
+    char prefix[PREFIX_MAX_LENGTH + 1];
 
-	void logIt(const char* const severity, const char* const text,
-			va_list args) const;
+    void logIt(const char* const severity, const char* const text,
+            va_list args) const;
 
-	bool isAllowedToLogOnLevel(LogLevel level) const;
+    bool isAllowedToLogOnLevel(LogLevel level) const;
 };
 
 #endif /* LOGGER_LOGGER_H_ */

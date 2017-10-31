@@ -184,10 +184,10 @@ environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.DTS
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.DTS/value=0
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.LOCAL/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.LOCAL/operation=replace
-environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.LOCAL/value=1509438429
+environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.LOCAL/value=1509456811
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.UTC/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.UTC/operation=replace
-environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.UTC/value=1509434829
+environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.UTC/value=1509453211
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.ZONE/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.ZONE/operation=replace
 environment/project/io.sloeber.core.toolChain.release.137624631/A.EXTRA.TIME.ZONE/value=3600
@@ -412,7 +412,7 @@ environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.
 environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PARAMS.VERBOSE/value=-vv
 environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PATTERN/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PATTERN/operation=replace
-environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PATTERN/value="${A.TOOLS.ESPTOOL.PATH}/${A.TOOLS.ESPTOOL.CMD}" ${A.TOOLS.ESPTOOL.UPLOAD.VERBOSE} -cd ${A.UPLOAD.RESETMETHOD} -cb ${A.UPLOAD.SPEED} -cp "${A.SERIAL.PORT}" -ca 0x00000 -cf "${A.BUILD.PATH}/${A.BUILD.PROJECT_NAME}.bin"
+environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PATTERN/value="python E\:\\git\\sloeber\\arduinoPlugin\\packages\\esp8266\\tools\\esptool\\esptool-master\\esptool.py" --port "${A.SERIAL.PORT}" --baud ${A.UPLOAD.SPEED} write_flash 0x00000 "${A.BUILD.PATH}/${A.BUILD.PROJECT_NAME}.bin"
 environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PROTOCOL/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PROTOCOL/operation=replace
 environment/project/io.sloeber.core.toolChain.release.137624631/A.TOOLS.ESPTOOL.UPLOAD.PROTOCOL/value=esp
@@ -457,7 +457,7 @@ environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.BOARD_NAM
 environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.BOARD_NAME/value=WeMos D1 R2 & mini
 environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.COM_PORT/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.COM_PORT/operation=replace
-environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.COM_PORT/value=/dev/ttyUSB0
+environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.COM_PORT/value=COM4
 environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.ECLIPSE_LOCATION/delimiter=;
 environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.ECLIPSE_LOCATION/operation=replace
 environment/project/io.sloeber.core.toolChain.release.137624631/JANTJE.ECLIPSE_LOCATION/value=E\:\\git\\sloeber\\
