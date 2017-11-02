@@ -47,11 +47,13 @@ public:
      */
     void print(Print& out) const;
     void printPm25AndPm10(Print& out) const;
+    void printPm25AndPm10(Print& out, const char* const format) const;
 
 private:
     PMUnit pm01;
     PMUnit pm25;
     PMUnit pm10;
+
 };
 
 #endif /* PMS3003_PMSDATA_H_ */

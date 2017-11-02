@@ -54,8 +54,11 @@ void PmsData::print(Print& out) const {
 }
 
 void PmsData::printPm25AndPm10(Print& out) const {
-    out.print("PM25: ");
-    out.println(getPm25());
-    out.print("PM10: ");
-    out.println(getPm10());
+    const char* format = "PM25: %u\nPM10: %u\n";
+    printPm25AndPm10(out, format);
 }
+
+void PmsData::printPm25AndPm10(Print& out, const char* const format) const {
+    out.printf(format, getPm25(), getPm10());
+}
+

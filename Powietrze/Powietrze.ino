@@ -1,9 +1,11 @@
 #include <WiFiClient.h>
 #include <ESP8266WiFi.h>
-#include <SparkFun_Micro_OLED/src/I2cCommunicationOled.h>
 #include "EspSoftwareSerial/SoftwareSerial.h"
 #include "SparkFun_Si7021/src/Si7021.h"
-#include "SparkFun_Micro_OLED/src/SFE_MicroOLED.h"
+
+#include "I2cCommunicationOled.h"
+#include "SFE_MicroOLED.h"
+
 #include "Duration.h"
 #include "Logger.h"
 
@@ -55,7 +57,7 @@ Si7021 si7021;
 
 /* OLED */
 I2cCommunicationOled i2cCommunicationOled;
-MicroOLED oled(i2cCommunicationOled, 255);
+MicroOLED oled(i2cCommunicationOled, 255, OledRotationMode::DEGREE270);
 
 bool connectWifi() {
     return wifiManager.connect();
@@ -163,19 +165,19 @@ void printData() {
         logger.logInfo("PM2.5: %u, PM10: %u", lastPmsData.getPm25(),
                 lastPmsData.getPm10());
 
-        lastPmsData.printPm25AndPm10(oled);
+        lastPmsData.printPm25AndPm10(oled, "PM25 %3uPM10 %3u");
     }
 
     oled.println();
 
     if (emptySiData != lastSiData) {
-        logger.logInfo("Temp: %f, RH: %f", lastSiData.getTemp(),
-                lastSiData.getRh());
-
         String temp(lastSiData.getTemp(), 1);
         String rh(lastSiData.getRh(), 1);
-        oled.printf("T  %5s C", temp.c_str());
-        oled.printf("RH %5s %%", rh.c_str());
+
+        logger.logInfo("Temp: %s, RH: %s", temp.c_str(), rh.c_str());
+
+        oled.printf("T %5sC", temp.c_str());
+        oled.printf("RH%5s%%", rh.c_str());
     }
 
     oled.display();
@@ -185,9 +187,7 @@ void printData() {
 
 void fakeData() {
     lastPmsData = PmsData(0, random(100), random(200));
-    float temp = random(-60, 120);
-    float rh = random(300);
-    lastSiData = TempRhData(temp / 3.0f, rh / 3.0f);
+    lastSiData = readSi();
 }
 
 void countDown() {
@@ -195,8 +195,8 @@ void countDown() {
     if (count >= 0) {
         oled.clear(OledClearMode::PAGE);
         oled.setFontType(3);
-        oled.setCursor(24, 0);
-        oled.print(count--);
+        oled.setCursor(0, 0);
+        oled.printf("%3d", count--);
         oled.display();
     } else if (count-- == -1) {
         oled.clear(OledClearMode::ALL);
@@ -208,7 +208,8 @@ void setup() {
     pinMode(PMS_SET_PIN, OUTPUT);
 
     Serial.begin(9600);
-    pmsSerial.begin(9600);
+    //pmsSerial.begin(9600);
+    si7021.begin();
 
     oled.begin();
     oled.clear(OledClearMode::ALL);
