@@ -1,0 +1,3 @@
+[submodule "libraries/MicroOLED_64x48"]
+	path = libraries/MicroOLED_64x48
+	url = https://github.com/kefasb/MicroOLED_64x48.git
