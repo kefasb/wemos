@@ -57,7 +57,8 @@ Si7021 si7021;
 
 /* OLED */
 I2cCommunicationOled i2cCommunicationOled;
-MicroOLED oled(i2cCommunicationOled, 255, OledRotationMode::DEGREE270);
+MicroOLED oled(i2cCommunicationOled, 255, OledRotationMode::DEGREE90,
+        OledLineFoldMode::NEW_LINE_OPTIONAL);
 
 bool connectWifi() {
     return wifiManager.connect();
@@ -165,7 +166,7 @@ void printData() {
         logger.logInfo("PM2.5: %u, PM10: %u", lastPmsData.getPm25(),
                 lastPmsData.getPm10());
 
-        lastPmsData.printPm25AndPm10(oled, "PM25 %3uPM10 %3u");
+        lastPmsData.printPm25AndPm10(oled, "PM25 %3u\nPM10 %3u\n");
     }
 
     oled.println();
@@ -176,8 +177,8 @@ void printData() {
 
         logger.logInfo("Temp: %s, RH: %s", temp.c_str(), rh.c_str());
 
-        oled.printf("T %5sC", temp.c_str());
-        oled.printf("RH%5s%%", rh.c_str());
+        oled.printf("T %5sC\n", temp.c_str());
+        oled.printf("RH%5s%%\n", rh.c_str());
     }
 
     oled.display();
